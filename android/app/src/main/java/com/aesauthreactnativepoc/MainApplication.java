@@ -1,4 +1,4 @@
-package com.aesauthreactnativepoc;
+package com.BleDemoReactNative;
 
 import android.app.Application;
 import android.content.Context;

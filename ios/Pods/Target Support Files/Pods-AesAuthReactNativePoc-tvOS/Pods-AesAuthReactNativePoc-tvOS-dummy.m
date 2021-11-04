@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-@interface PodsDummy_Pods_AesAuthReactNativePoc_tvOS : NSObject
+@interface PodsDummy_Pods_BleDemoReactNative_tvOS : NSObject
 @end
-@implementation PodsDummy_Pods_AesAuthReactNativePoc_tvOS
+@implementation PodsDummy_Pods_BleDemoReactNative_tvOS
 @end
