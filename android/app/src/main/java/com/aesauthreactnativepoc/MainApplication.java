@@ -1,4 +1,4 @@
-package com.BleDemoReactNative;
+package com.bledemo;
 
 import android.app.Application;
 import android.content.Context;

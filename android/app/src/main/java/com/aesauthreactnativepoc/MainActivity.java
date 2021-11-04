@@ -1,4 +1,4 @@
-package com.BleDemoReactNative;
+package com.bledemo;
 
 import com.facebook.react.ReactActivity;
 
