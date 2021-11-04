@@ -22,10 +22,16 @@ RN 0.30-0.39 supported until 2.4.3
 npm install
 ```
 
-##### Android - Update Manifest
+##### Android
 
 ```xml
 react-native run-android
+```
+
+or
+
+```xml
+npm run android
 ```
 
 In Android API 29 >= you need to use "ACCESS_FINE_LOCATION" instead of "ACCESS_COARSE_LOCATION".
