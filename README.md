@@ -22,7 +22,7 @@ RN 0.30-0.39 supported until 2.4.3
 npm install
 ```
 
-##### Android
+##### Running - Android
 
 ```xml
 react-native run-android
@@ -50,20 +50,6 @@ In iOS >= 13 you need to add the `NSBluetoothAlwaysUsageDescription` string key.
 - Android API >= 29 require the ACCESS_FINE_LOCATION permission to scan for peripherals.
    React-Native 0.63.X started targeting Android API 29.
 - Before write, read or start notification you need to call `retrieveServices` method
-
-## Example
-
-The easiest way to test is simple make your AppRegistry point to our example component, like this:
-
-```javascript
-// in your index.ios.js or index.android.js
-import React, { Component } from "react";
-import { AppRegistry } from "react-native";
-import App from "react-native-ble-manager/example/App"; //<-- simply point to the example js!
-AppRegistry.registerComponent("MyAwesomeApp", () => App);
-```
-
-Or, you can still look into the whole [example](https://github.com/innoveit/react-native-ble-manager/tree/master/example) folder for a standalone project.
 
 ## Methods
 
