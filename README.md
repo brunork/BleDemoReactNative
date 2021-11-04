@@ -22,7 +22,7 @@ RN 0.30-0.39 supported until 2.4.3
 npm install
 ```
 
-##### Running - Android
+## Running - Android
 
 ```xml
 react-native run-android
