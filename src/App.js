@@ -18,6 +18,7 @@ import {
 
 // Styles
 import Colors from "./theme/Colors";
+import aesjs from "aes-js";
 import { btoa, concatArrayAndCommand, base64ToArrayBuffer, arrayToBase64 } from './utilities/helperFunctions';
 
 // Native Modules
@@ -91,6 +92,24 @@ const App = () => {
         setList(Array.from(peripherals.values()));
     };
 
+    const authenticateDevice = async (service, characteristic, connectionKey) => {
+        try {
+        //   let receivedKey = characteristic.value.substring(4);
+          let concatKeyInBytes = base64ToArrayBuffer(connectionKey);
+          let encryptor = new aesjs.ModeOfOperation.ecb(blekey);
+          let encryptedKeyInBytes = encryptor.encrypt(concatKeyInBytes);
+          let finalValue = concatArrayAndCommand([3, 0], encryptedKeyInBytes);
+
+          console.log(finalValue, arrayToBase64(finalValue));
+          BleManager.writeWithoutResponse(service, characteristic, arrayToBase64(finalValue))
+            .catch(error => {
+              alert("Sending encrypted key back to device failed", error);
+            })
+        } catch (error) {
+          console.log('Failed to authenticate device', error);
+        }
+      }
+
     const pressPeripheral = async (peripheral) => {
         console.log("pressPeripheral");
         BleManager.connect(peripheral.id)
@@ -98,8 +117,7 @@ const App = () => {
                 console.log("Connected to " + peripheral.id);
                 alert(JSON.stringify("Connected to " + peripheral.id))
             })
-            .then((peripheralInfo) => {
-
+            .then(() => {
                 BleManager.retrieveServices(peripheral.id)
                     .then((peripheralInfo) => {
                         console.log('peripheralInfo: ', peripheralInfo)
@@ -111,16 +129,14 @@ const App = () => {
 
                     BleManager.startNotification(peripheralInfo.id, service, bakeCharacteristic)
                         .then(async () => {
-                            let connectionKey = concatArrayAndCommand([1, 8], blekey);
+                            let connectionKey = concatArrayAndCommand([1, 95], blekey);
 
                             console.log('Started notification channel')
-
-                            const responseWrite = await BleManager.write(peripheral.id, service, crustCharacteristic, arrayToBase64(connectionKey))
-                            console.log('responseWrite: ', responseWrite);
+                            authenticateDevice(service, crustCharacteristic, connectionKey);
                         })
                     })
                     .catch(error => {
-                        console.log("..:: Error ::.. ", error);
+                        console.log("Error: ", error);
                     })
             })
             .catch((error) => {
