@@ -18,7 +18,7 @@ import {
 
 // Styles
 import Colors from "./theme/Colors";
-import btoa from './utilities/helperFunctions'
+import { btoa, concatArrayAndCommand, base64ToArrayBuffer, arrayToBase64 } from './utilities/helperFunctions';
 
 // Native Modules
 const BleManagerModule = NativeModules.BleManager;
@@ -28,6 +28,7 @@ const App = () => {
     const [isScanning, setIsScanning] = useState(false);
     const peripherals = new Map();
     const [list, setList] = useState([]);
+    const blekey = new Uint8Array([245, 210, 41, 135, 101, 10, 29, 130, 5, 171, 130, 190, 185, 56, 89, 207]);
 
     const startScan = () => {
         if (!isScanning) {
@@ -97,7 +98,8 @@ const App = () => {
                 console.log("Connected to " + peripheral.id);
                 alert(JSON.stringify("Connected to " + peripheral.id))
             })
-            .then(() => {
+            .then((peripheralInfo) => {
+
                 BleManager.retrieveServices(peripheral.id)
                     .then((peripheralInfo) => {
                         console.log('peripheralInfo: ', peripheralInfo)
@@ -107,20 +109,15 @@ const App = () => {
                         let crustCharacteristic =
                             peripheralInfo.characteristics[11].characteristic;
 
-                        BleManager.writeWithoutResponse(
-                            peripheral.id,
-                            service,
-                            crustCharacteristic,
-                            btoa('\x02\x00'),
-                            150,
-                            1
-                        )
-                            .then(() => {
-                                console.log('writeWithoutResponse success');
-                            })
-                            .catch(error => {
-                                console.log('error: ', error);
-                            })
+                    BleManager.startNotification(peripheralInfo.id, service, bakeCharacteristic)
+                        .then(async () => {
+                            let connectionKey = concatArrayAndCommand([1, 8], blekey);
+
+                            console.log('Started notification channel')
+
+                            const responseWrite = await BleManager.write(peripheral.id, service, crustCharacteristic, arrayToBase64(connectionKey))
+                            console.log('responseWrite: ', responseWrite);
+                        })
                     })
                     .catch(error => {
                         console.log("..:: Error ::.. ", error);
