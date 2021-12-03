@@ -29,7 +29,9 @@ const App = () => {
     const [isScanning, setIsScanning] = useState(false);
     const peripherals = new Map();
     const [list, setList] = useState([]);
-    const blekey = new Uint8Array([245, 210, 41, 135, 101, 10, 29, 130, 5, 171, 130, 190, 185, 56, 89, 207]);
+    // const blekey = new Uint8Array([245, 210, 41, 135, 101, 10, 29, 130, 5, 171, 130, 190, 185, 56, 89, 207]);
+    const blekey = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
+    const iv = [ 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,35, 36 ];
 
     const startScan = () => {
         if (!isScanning) {
@@ -96,7 +98,7 @@ const App = () => {
         try {
         //   let receivedKey = characteristic.value.substring(4);
           let concatKeyInBytes = base64ToArrayBuffer(connectionKey);
-          let encryptor = new aesjs.ModeOfOperation.ecb(blekey);
+          let encryptor = new aesjs.ModeOfOperation.ofb(blekey, iv);;
           let encryptedKeyInBytes = encryptor.encrypt(concatKeyInBytes);
           let finalValue = concatArrayAndCommand([3, 0], encryptedKeyInBytes);
 
