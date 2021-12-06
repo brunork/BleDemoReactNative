@@ -32,6 +32,7 @@ const App = () => {
     // const blekey = new Uint8Array([245, 210, 41, 135, 101, 10, 29, 130, 5, 171, 130, 190, 185, 56, 89, 207]);
     const blekey = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ];
     const iv = [ 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,35, 36 ];
+    const text = 'TextMustBe16Byte';
 
     const startScan = () => {
         if (!isScanning) {
@@ -96,21 +97,23 @@ const App = () => {
 
     const authenticateDevice = async (service, characteristic, connectionKey) => {
         try {
-        //   let receivedKey = characteristic.value.substring(4);
-          let concatKeyInBytes = base64ToArrayBuffer(connectionKey);
-          let encryptor = new aesjs.ModeOfOperation.ofb(blekey, iv);;
-          let encryptedKeyInBytes = encryptor.encrypt(concatKeyInBytes);
+          let textBytes = aesjs.utils.utf8.toBytes(text);
+          let encryptor = new aesjs.ModeOfOperation.cbc(blekey, iv);
+          let encryptedKeyInBytes = encryptor.encrypt(textBytes);
           let finalValue = concatArrayAndCommand([3, 0], encryptedKeyInBytes);
 
           console.log(finalValue, arrayToBase64(finalValue));
-          BleManager.writeWithoutResponse(service, characteristic, arrayToBase64(finalValue))
+          BleManager.write(service, characteristic, arrayToBase64(finalValue))
+            .then(() => {
+                console.log('writeWithoutResponse..')
+            })
             .catch(error => {
               alert("Sending encrypted key back to device failed", error);
             })
         } catch (error) {
           console.log('Failed to authenticate device', error);
         }
-      }
+    }
 
     const pressPeripheral = async (peripheral) => {
         console.log("pressPeripheral");
@@ -132,9 +135,13 @@ const App = () => {
                     BleManager.startNotification(peripheralInfo.id, service, bakeCharacteristic)
                         .then(async () => {
                             let connectionKey = concatArrayAndCommand([1, 95], blekey);
-
                             console.log('Started notification channel')
-                            authenticateDevice(service, crustCharacteristic, connectionKey);
+
+                            BleManager.createBond(peripheralInfo.id)
+                                .then(() => {
+                                    console.log('binding..')
+                                    authenticateDevice(service, crustCharacteristic, connectionKey);
+                                }) 
                         })
                     })
                     .catch(error => {
